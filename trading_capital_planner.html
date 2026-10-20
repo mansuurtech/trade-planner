@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Capital Planner</title>
+
+<link rel="stylesheet" href="styles.css">
+<script src="app.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Winning-only + loss stress · compounding</div>
+      <h1>Trading Capital Planner</h1>
+      <p>Compare up to four plans side by side. The winning projection assumes every trade wins; the loss stress test shows what 3, 5, or 10 consecutive losses would do to each balance.</p>
+    </div>
+    <div class="actions">
+      <button id="themeBtn" class="ghost icon-btn" type="button" aria-label="Switch theme" title="Switch theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"></path>
+        </svg>
+      </button>
+      <button id="saveBtn" class="primary" type="button">Save snapshot</button>
+      <button id="exportPdfBtn" type="button">Export PDF</button>
+      <button id="resetBtn" class="danger" type="button">Reset</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="compareTitle">
+    <div class="globalbar">
+      <div>
+        <h2 id="compareTitle" class="section-title">Plan comparison <span class="theory-badge">winning-only theory</span></h2>
+        <div class="muted small">Edit any cell or drag the grip to reorder plans — the loss test and roadmap follow the same order. Risk has 1–5% defaults and still accepts custom percentages; “Fastest” marks the fewest consecutive wins.</div>
+      </div>
+      <button id="addBtn" type="button">+ Add plan</button>
+    </div>
+    <div id="planTable"></div>
+    <div id="planLimitNote" class="foot warning-note" hidden></div>
+  </section>
+
+  <section class="panel loss-panel" aria-labelledby="lossTitle">
+    <div class="globalbar">
+      <div>
+        <h2 id="lossTitle" class="section-title">Loss stress test <span class="hypo-badge">hypothetical</span></h2>
+        <div class="muted small">Compounded consecutive losses at each plan's current risk. This is a stress test, not a probability estimate.</div>
+      </div>
+    </div>
+    <div id="lossTable"></div>
+    <div class="foot">Ending balance = starting balance × (1 − risk)^N. Recovery = (starting balance ÷ ending balance − 1) × 100. Excludes commissions, spread, slippage, missed setups, and execution errors.</div>
+  </section>
+
+  <section class="panel roadmap" id="roadmap" aria-labelledby="roadmapTitle">
+    <div class="roadmap-head">
+      <div>
+        <h2 id="roadmapTitle" class="section-title">Winning-only roadmap</h2>
+        <div id="roadmapCaption" class="muted small">Select a plan to inspect its theoretical winning sequence.</div>
+      </div>
+      <div class="roadmap-controls">
+        <div class="select-wrap">
+          <label for="roadmapSelect">Plan</label>
+          <select id="roadmapSelect"></select>
+        </div>
+        <div class="page-size-wrap">
+          <label for="pageSizeInput">Rows / page</label>
+          <input id="pageSizeInput" type="number" min="1" max="500" step="1" value="10" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+    <div class="tablewrap">
+      <table class="roadmap-table">
+        <thead>
+          <tr>
+            <th>Win #</th>
+            <th>Opening balance</th>
+            <th title="Edit any row to override the plan default">Risk %</th>
+            <th>Cash risk</th>
+            <th>Reward (R)</th>
+            <th>Profit</th>
+            <th>Ending balance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="roadmapBody"></tbody>
+      </table>
+    </div>
+    <div id="roadmapPager" class="pager" hidden></div>
+    <div id="roadmapNote" class="foot roadmap-note" hidden></div>
+    <div class="foot">Risk % is editable per row — clear a value to use the plan default. The roadmap is a theoretical winning-only sequence; it is not an expected result.</div>
+  </section>
+
+  <section class="panel history" aria-labelledby="historyTitle">
+    <div class="globalbar">
+      <div>
+        <h2 id="historyTitle" class="section-title">Saved history</h2>
+        <div class="muted small">Snapshots are stored in this browser using localStorage.</div>
+      </div>
+      <div class="actions">
+        <button id="exportJsonBtn" class="ghost" type="button">Backup JSON</button>
+        <button id="clearHistoryBtn" class="ghost" type="button">Clear history</button>
+      </div>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </section>
+
+  <details class="notice">
+    <summary>Risk warning — read before using projections</summary>
+    <p><strong>Winning-only theory:</strong> the winning projection assumes every trade wins and reaches the full selected R-multiple. It is a theoretical scenario, not an expected result or a forecast.</p>
+    <p><strong>Loss stress test:</strong> the drawdown and recovery figures are hypothetical. They show what compounded losses would do, but they do not estimate the probability of a losing streak.</p>
+    <p>Both scenarios exclude commissions, spread, swaps, slippage, missed setups, and execution errors. Actual trading outcomes can be materially worse.</p>
+    <p>This planner is for planning only and does not validate TTFM setups. Your target must never pressure you to force a trade or increase risk.</p>
+  </details>
+
+  <p class="foot">Storage note: saved plans and snapshots remain in this browser on this device. They are not uploaded or synced. Clearing browser/site data, using private browsing, or switching devices may erase them — use “Backup JSON” to keep a restorable copy.</p>
+</div>
+
+<div id="printRoot" class="print-root" aria-hidden="true"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+</body>
+</html>
