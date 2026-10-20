@@ -2,7 +2,7 @@
 
 A browser-based trading capital planner for comparing multiple plans side by side. It combines a **theoretical winning-only projection** with a **hypothetical consecutive-loss stress test**.
 
-No build step or server is required. Open `trading_capital_planner.html` in a modern browser.
+No build step or server is required. Open `index.html` in a modern browser.
 
 ## Features
 
@@ -31,7 +31,7 @@ No build step or server is required. Open `trading_capital_planner.html` in a mo
 
 ## How To Use
 
-1. Open `trading_capital_planner.html`.
+1. Open `index.html`.
 2. Edit the values in the plan comparison table.
 3. Use **+ Add plan** to compare more scenarios.
 4. Drag a plan's grip handle to reorder plans.
@@ -81,6 +81,6 @@ Plans, snapshots, theme choice, and page size are stored locally in the browser 
 
 | File | Purpose |
 | --- | --- |
-| `trading_capital_planner.html` | Page structure and layout |
+| `index.html` | Page structure and layout |
 | `styles.css` | Theme, layout, responsive, print, and animation styles |
 | `app.js` | Planner logic, calculations, storage, drag reordering, exports, and animations |
