@@ -1,17 +1,25 @@
 "use strict";
 
 const THEME_KEY = "ttfmCapitalPlanner.theme";
+const systemThemeQuery = typeof window.matchMedia === "function"
+  ? window.matchMedia("(prefers-color-scheme: light)")
+  : null;
 
-(function initTheme() {
+function getManualTheme() {
   try {
     const saved = localStorage.getItem(THEME_KEY);
-    const theme = saved === "light" || saved === "dark"
-      ? saved
-      : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-    document.documentElement.setAttribute("data-theme", theme);
+    return saved === "light" || saved === "dark" ? saved : null;
   } catch (e) {
-    document.documentElement.setAttribute("data-theme", "dark");
+    return null;
   }
+}
+
+function getSystemTheme() {
+  return systemThemeQuery && systemThemeQuery.matches ? "light" : "dark";
+}
+
+(function initTheme() {
+  document.documentElement.setAttribute("data-theme", getManualTheme() || getSystemTheme());
 })();
 
 function initPlanner() {
@@ -1121,13 +1129,15 @@ function initPlanner() {
     showToast("Snapshot saved in this browser.");
   }
 
-  function applyTheme(theme) {
+  function applyTheme(theme, persistTheme) {
     document.documentElement.setAttribute("data-theme", theme);
 
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-    } catch (e) {
-      /* ignore unavailable storage */
+    if (persistTheme) {
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (e) {
+        /* ignore unavailable storage */
+      }
     }
 
     const next = theme === "dark" ? "light" : "dark";
@@ -1396,13 +1406,26 @@ function initPlanner() {
     void themeBtn.offsetWidth;
     themeBtn.classList.add("spin");
 
-    applyTheme(current === "dark" ? "light" : "dark");
+    applyTheme(current === "dark" ? "light" : "dark", true);
 
     window.setTimeout(() => {
       document.documentElement.classList.remove("theme-transition");
       themeBtn.classList.remove("spin");
     }, 420);
   });
+
+  if (systemThemeQuery) {
+    const handleSystemThemeChange = (event) => {
+      if (getManualTheme()) return;
+      applyTheme(event.matches ? "light" : "dark", false);
+    };
+
+    if (typeof systemThemeQuery.addEventListener === "function") {
+      systemThemeQuery.addEventListener("change", handleSystemThemeChange);
+    } else if (typeof systemThemeQuery.addListener === "function") {
+      systemThemeQuery.addListener(handleSystemThemeChange);
+    }
+  }
 
   const savedState = safeRead(STORE_KEY, null);
   state = savedState && Array.isArray(savedState.plans) && savedState.plans.length

@@ -23,7 +23,7 @@ No build step or server is required. Open `index.html` in a modern browser.
 - Drag plan columns to reorder them. The loss stress test, roadmap selector, and saved order follow the new order.
 - Keyboard reordering: focus a drag handle and use `←` / `→`.
 - Roadmap pagination with a configurable number of rows per page.
-- Dark and light themes with a green primary accent.
+- Dark and light themes with a green primary accent. The planner follows your system theme until you choose one manually; a manual choice is saved.
 - Responsive, full-width layout.
 - Save snapshots in browser `localStorage`, then restore or delete them.
 - Export a PDF containing all plans, the loss stress test, and each plan's roadmap.
@@ -75,7 +75,7 @@ Losses compound against the **current balance**, not the original balance. The l
 
 ## Data And Privacy
 
-Plans, snapshots, theme choice, and page size are stored locally in the browser using `localStorage`. Nothing is uploaded to a server. Clearing browser/site data, using private browsing, or switching devices may erase the data. Use **Backup JSON** for a restorable backup.
+Plans, snapshots, manual theme choice, and page size are stored locally in the browser using `localStorage`. Nothing is uploaded to a server. Clearing browser/site data, using private browsing, or switching devices may erase the data. Use **Backup JSON** for a restorable backup.
 
 ## Files
 
